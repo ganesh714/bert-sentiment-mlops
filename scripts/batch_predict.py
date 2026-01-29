@@ -14,7 +14,7 @@ def predict_batch(input_file, output_file, model_dir="model_output"):
         print(f"Error: Could not find model in {model_dir}. Please train the model first.")
         return
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
     model.to(device)
     model.eval()
 
