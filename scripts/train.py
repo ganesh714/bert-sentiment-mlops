@@ -88,9 +88,9 @@ def main():
         per_device_eval_batch_size=16 if not args.debug else 2,
         num_train_epochs=3 if not args.debug else 1,
         weight_decay=0.01,
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_strategy="no", # We save explicitly at the end
-        use_cpu=not torch.cuda.is_available(),
+        use_cpu=True if args.debug else not torch.cuda.is_available(),
     )
 
     trainer = Trainer(
