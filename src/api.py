@@ -2,7 +2,7 @@ import os
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
 
@@ -27,9 +27,15 @@ async def load_model():
     model_path = os.getenv("MODEL_PATH", "model_output")
     print(f"Loading model from {model_path}...")
     
+    # Debug: Check directory contents
+    if os.path.exists(model_path):
+        print(f"Contents of {model_path}: {os.listdir(model_path)}")
+    else:
+        print(f"Error: {model_path} does not exist!")
+
     try:
-        tokenizer = BertTokenizer.from_pretrained(model_path)
-        model = BertForSequenceClassification.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        model = AutoModelForSequenceClassification.from_pretrained(model_path)
         
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
@@ -37,9 +43,8 @@ async def load_model():
         print("Model loaded successfully.")
     except Exception as e:
         print(f"Error loading model: {e}")
-        # We don't crash here so that the container can start and maybe we can fix it or it's a mount issue
-        # But requests will fail.
-        pass
+        import traceback
+        traceback.print_exc()
 
 @app.get("/health")
 async def health_check():
